@@ -4,7 +4,7 @@
   "parserOptions": { "project": true, "tsconfigRootDir": "./" },
   "plugins": ["@typescript-eslint"],
   "root": true,
-  "ignorePatterns": ["dist"],
+  "ignorePatterns": ["dist", "src/@mocks/**/*"],
   "rules": {
     "@typescript-eslint/consistent-type-imports": [2, { "fixStyle": "separate-type-imports" }],
     "@typescript-eslint/no-restricted-imports": [
@@ -14,14 +14,10 @@
           {
             "name": "react-redux",
             "importNames": ["useSelector", "useStore", "useDispatch"],
-            "message": "Please use pre-typed versions from `src/app/hooks.ts` instead."
+            "message": "Please use pre-typed versions from `@app/store` instead."
           }
         ]
       }
     ]
-  },
-  "overrides": [
-    { "files": ["*.{c,m,}{t,j}s", "*.{t,j}sx"] },
-    { "files": ["*{test,spec}.{t,j}s?(x)"], "env": { "jest": true } }
-  ]
+  }
 }

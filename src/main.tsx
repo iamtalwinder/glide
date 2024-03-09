@@ -1,6 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { CssBaseline } from '@mui/material';
 import App from './app';
 import { store } from './app/store';
 
@@ -11,8 +13,11 @@ if (container) {
 
   root.render(
     <React.StrictMode>
+      <CssBaseline />
       <Provider store={store}>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </Provider>
     </React.StrictMode>
   );
