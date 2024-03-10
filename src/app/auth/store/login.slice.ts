@@ -43,7 +43,13 @@ export const loginSlice = createAppSlice({
         }
       }
     )
-  })
+  }),
+  selectors: {
+    selectLoginError: state => state.errors,
+  },
 });
+
+export const { submitLogin } = loginSlice.actions;
+export const { selectLoginError } = loginSlice.selectors;
 
 export default loginSlice.reducer;

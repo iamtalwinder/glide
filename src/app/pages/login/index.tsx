@@ -12,6 +12,8 @@ import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Container, FormControl } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '@app/store';
+import { selectLoginError, submitLogin } from '@app/auth/store/login.slice';
 
 const schema = yup.object().shape({
   email: yup.string().email('You must enter a valid email').required('You must enter a email'),
@@ -29,6 +31,9 @@ const defaultValues = {
 };
 
 export default function LoginPage() {
+  const dispatch = useAppDispatch();
+  const loginErrors = useAppSelector((state) => selectLoginError(state.auth));
+
   const { control, formState, handleSubmit, reset } = useForm({
     mode: 'onChange',
     defaultValues,
@@ -37,7 +42,10 @@ export default function LoginPage() {
 
   const { errors } = formState;
 
-  function onSubmit() {
+  function onSubmit(data: yup.InferType<typeof schema>) {
+    const {email, password} = data;
+
+    dispatch(submitLogin({email, password}));
     reset(defaultValues);
   }
 
