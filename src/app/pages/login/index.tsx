@@ -6,6 +6,8 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import * as yup from 'yup';
@@ -13,7 +15,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Container, FormControl } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@app/store';
-import { selectLoginError, submitLogin } from '@app/auth/store/login.slice';
+import { selectLoginError, selectLoginStatus, submitLogin } from '@app/auth/store/login.slice';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { APIStatusEnum } from '@app/types';
 
 const schema = yup.object().shape({
   email: yup.string().email('You must enter a valid email').required('You must enter a email'),
@@ -31,10 +36,12 @@ const defaultValues = {
 };
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const loginErrors = useAppSelector((state) => selectLoginError(state.auth));
+  const loginErrors = useAppSelector(state => selectLoginError(state.auth));
+  const loginStatus = useAppSelector(state => selectLoginStatus(state.auth));
 
-  const { control, formState, handleSubmit, reset } = useForm({
+  const { control, formState, handleSubmit } = useForm({
     mode: 'onChange',
     defaultValues,
     resolver: yupResolver(schema)
@@ -43,11 +50,15 @@ export default function LoginPage() {
   const { errors } = formState;
 
   function onSubmit(data: yup.InferType<typeof schema>) {
-    const {email, password} = data;
-
-    dispatch(submitLogin({email, password}));
-    reset(defaultValues);
+    const { email, password } = data;
+    dispatch(submitLogin({ email, password }));
   }
+
+  useEffect(() => {
+    if (loginStatus === APIStatusEnum.SUCCESS) {
+      navigate('/dashboard');
+    }
+  }, [loginStatus, navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -65,6 +76,11 @@ export default function LoginPage() {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
+        <Stack sx={{ width: '100%' }} spacing={2}>
+          {loginErrors.map((error, index) => (
+            <Alert key={index} severity="error">{error.message}</Alert>
+          ))}
+        </Stack>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <Controller
             name="email"

@@ -8,8 +8,15 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useAppDispatch, useAppSelector } from '@app/store';
+import { submitRegister, selectRegisterError, selectRegisterStatus } from '@app/auth/store/register.slice';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { APIStatusEnum } from '@app/types';
 
 const schema = yup.object().shape({
   firstName: yup.string().required('You must enter first name'),
@@ -29,6 +36,11 @@ const defaultValues = {
 };
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const registerErrors = useAppSelector(state => selectRegisterError(state.auth));
+  const registerStatus = useAppSelector(state => selectRegisterStatus(state.auth));
+
   const { control, formState, handleSubmit } = useForm({
     mode: 'onChange',
     defaultValues,
@@ -37,7 +49,16 @@ export default function RegisterPage() {
 
   const { errors } = formState;
 
-  function onSubmit() {}
+  function onSubmit(data: yup.InferType<typeof schema>) {
+    const { firstName, lastName, email, password } = data;
+    dispatch(submitRegister({ name: firstName + lastName, email, password }));
+  }
+
+  useEffect(() => {
+    if (registerStatus === APIStatusEnum.SUCCESS) {
+      navigate('/dashboard');
+    }
+  }, [registerStatus, navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -55,6 +76,11 @@ export default function RegisterPage() {
         <Typography component="h1" variant="h5">
           Register
         </Typography>
+        <Stack sx={{ width: '100%' }} spacing={2}>
+          {registerErrors.map((error, index) => (
+            <Alert key={index} severity="error">{error.message}</Alert>
+          ))}
+        </Stack>
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -120,7 +146,7 @@ export default function RegisterPage() {
             </Grid>
             <Grid item xs={12}>
               <Controller
-                name="firstName"
+                name="password"
                 control={control}
                 render={({ field }) => (
                   <TextField

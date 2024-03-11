@@ -1,3 +1,4 @@
+import { Response } from 'miragejs';
 import { users } from '../data/users';
 import { JwtService } from '../service/jwt.service';
 

@@ -26,19 +26,20 @@ export const loginSlice = createAppSlice({
           const response = await authService.login(email, password);
           dispatch(setUser(response.user));
         } catch (error: any) {
-          console.error(error, error.data);
-          return rejectWithValue('failed to login');
+          return rejectWithValue(error.response.data);
         }
       },
       {
         pending: state => {
+          state.errors = [];
           state.status = APIStatusEnum.LOADING;
         },
         fulfilled: state => {
-          state.status = APIStatusEnum.IDLE;
+          state.errors = [];
+          state.status = APIStatusEnum.SUCCESS;
         },
-        rejected: (state, payload) => {
-          console.error('payload', payload);
+        rejected: (state, actions: any) => {
+          state.errors = actions.payload.errors;
           state.status = APIStatusEnum.FAILED;
         }
       }
@@ -46,10 +47,11 @@ export const loginSlice = createAppSlice({
   }),
   selectors: {
     selectLoginError: state => state.errors,
+    selectLoginStatus: state => state.status
   },
 });
 
 export const { submitLogin } = loginSlice.actions;
-export const { selectLoginError } = loginSlice.selectors;
+export const { selectLoginError, selectLoginStatus } = loginSlice.selectors;
 
 export default loginSlice.reducer;

@@ -17,13 +17,13 @@ class AuthService {
   }
 
   async login(email: string, password: string) {
-    const response = await axios.post(`/login`, { email, password });
+    const response = await axios.post(`/api/login`, { email, password });
     this.setSession(response.data.accessToken, response.data.refreshToken);
     return response.data;
   }
 
   async register(userData: User & { password: string }) {
-    const response = await axios.post(`/register`, userData);
+    const response = await axios.post(`/api/register`, userData);
     this.setSession(response.data.accessToken, response.data.refreshToken);
     return response.data;
   }

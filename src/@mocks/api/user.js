@@ -1,3 +1,6 @@
+import { Response } from 'miragejs';
+import { JwtService } from '../service/jwt.service';
+
 export const userRoutes = function (schema, request) {
   this.get('/user-profile', () => {
     0;

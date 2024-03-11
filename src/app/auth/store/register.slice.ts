@@ -25,23 +25,33 @@ export const registerSlice = createAppSlice({
         try {
           const response = await authService.register(data);
           dispatch(setUser(response.user));
-        } catch (error) {
-          return rejectWithValue('failed to register');
+        } catch (error: any) {
+          return rejectWithValue(error.response.data);
         }
       },
       {
         pending: state => {
+          state.errors = [];
           state.status = APIStatusEnum.LOADING;
         },
         fulfilled: state => {
-          state.status = APIStatusEnum.IDLE;
+          state.errors = [];
+          state.status = APIStatusEnum.SUCCESS;
         },
-        rejected: state => {
+        rejected: (state, action: any) => {
+          state.errors = action.payload.errors;;
           state.status = APIStatusEnum.FAILED;
         }
       }
     )
-  })
+  }),
+  selectors: {
+    selectRegisterError: state => state.errors,
+    selectRegisterStatus: state => state.status
+  },
 });
+
+export const { submitRegister } = registerSlice.actions;
+export const { selectRegisterError, selectRegisterStatus } = registerSlice.selectors;
 
 export default registerSlice.reducer;
